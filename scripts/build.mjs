@@ -12,7 +12,7 @@ const product = process.env.FLEDGE_DIR || join(root, 'fledge')
 const out = process.env.OUT_DIR || join(root, 'site')
 const base = (process.env.BASE_PATH || '/docs').replace(/\/$/, '')
 const app = 'https://fledge.hugoxk.online'
-const guide = 'https://hugoxk.online/fledge/guide/?v=4'
+const guide = 'https://hugoxk.online/fledge/guide/?v=5'
 const gh = 'https://github.com/HugoXK/fledge'
 
 if (!existsSync(join(product, 'docs'))) {
