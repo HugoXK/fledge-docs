@@ -1,0 +1,14 @@
+{
+  "name": "fledge-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "marked": "^18.1.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
