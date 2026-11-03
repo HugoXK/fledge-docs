@@ -33,7 +33,8 @@ const all = walk(join(product, 'docs')).map((path) => 'docs/' + relative(join(pr
 const extra = ['README.md', 'README.zh.md'].filter((path) => existsSync(join(product, path)))
 const files = [...all, ...extra]
 
-const assetBase = (process.env.ASSET_BASE || `${base}/assets`).replace(/\/$/, '')
+const defaultAssetBase = base === '/docs' ? '/assets' : `${base}/assets`
+const assetBase = (process.env.ASSET_BASE || defaultAssetBase).replace(/\/$/, '')
 const slugOf = (path) => {
   if (path === 'README.md') return ''
   if (path === 'README.zh.md') return 'readme.zh'

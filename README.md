@@ -12,8 +12,9 @@ repo only owns the stylesheet and logo.
 
 ```sh
 npm install
+# custom domain: pages under /docs/, shared assets at /assets/
 FLEDGE_DIR=../fledge BASE_PATH=/docs OUT_DIR=site npm run build
-# or for the hugoxk.online mirror:
+# hugoxk.online mirror: pages and assets both under /fledge/docs/
 FLEDGE_DIR=../fledge BASE_PATH=/fledge/docs OUT_DIR=site-mirror npm run build
 ```
 
