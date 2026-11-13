@@ -95,8 +95,16 @@ mkdirSync(join(OUT, 'docs'), { recursive: true });
 mkdirSync(join(OUT, 'zh', 'docs'), { recursive: true });
 
 for (const p of PAGES) {
-  const enBody = `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/en/${p.slug}.md">Edit content/en/${p.slug}.md on GitHub ↗</a></p>` + (p.slug === 'overview' ? demoHtml('en') : '') + marked.parse(rewrite(read(enFile(p.slug)), 'en'));
-  const zhBody = `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/zh/${p.slug}.md">在 GitHub 上编辑 content/zh/${p.slug}.md ↗</a></p>` + (p.slug === 'overview' ? demoHtml('zh') : '') + marked.parse(rewrite(read(zhFile(p.slug)), 'zh'));
+  const enMd = rewrite(read(enFile(p.slug)), 'en');
+  const enCut = p.slug === 'overview' ? enMd.indexOf('\n## ') : -1;
+  const enIntro = enCut === -1 ? enMd : enMd.slice(0, enCut);
+  const enRest = enCut === -1 ? '' : enMd.slice(enCut + 1);
+  const enBody = `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/en/${p.slug}.md">Edit content/en/${p.slug}.md on GitHub ↗</a></p>` + marked.parse(enIntro) + (p.slug === 'overview' ? demoHtml('en') : '') + marked.parse(enRest);
+  const zhMd = rewrite(read(zhFile(p.slug)), 'zh');
+  const zhCut = p.slug === 'overview' ? zhMd.indexOf('\n## ') : -1;
+  const zhIntro = zhCut === -1 ? zhMd : zhMd.slice(0, zhCut);
+  const zhRest = zhCut === -1 ? '' : zhMd.slice(zhCut + 1);
+  const zhBody = `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/zh/${p.slug}.md">在 GitHub 上编辑 content/zh/${p.slug}.md ↗</a></p>` + marked.parse(zhIntro) + (p.slug === 'overview' ? demoHtml('zh') : '') + marked.parse(zhRest);
   const enTitle = titleOf(read(enFile(p.slug)), p.slug);
   const zhTitle = titleOf(read(zhFile(p.slug)), enTitle);
   const enDir = p.slug === 'overview' ? OUT : join(OUT, 'docs', p.slug);
