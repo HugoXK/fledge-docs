@@ -13,6 +13,7 @@ const ZH_DIR = join(ROOT, 'content', 'zh');
 
 const PAGES = [
   { slug: 'overview', groupEn: 'Overview', groupZh: '概览' },
+  { slug: 'demo', groupEn: 'Interactive demo', groupZh: '交互演示' },
   { slug: 'getting-started', groupEn: 'Getting started', groupZh: '快速开始' },
   { slug: 'architecture', groupEn: 'Concepts', groupZh: '概念' },
   { slug: 'security', groupEn: 'Concepts', groupZh: '概念' },
@@ -20,8 +21,8 @@ const PAGES = [
   { slug: 'operations', groupEn: 'Operations', groupZh: '运维' },
   { slug: 'contributing', groupEn: 'Development', groupZh: '开发' },
 ];
-const GROUPS_EN = ['Overview', 'Getting started', 'Concepts', 'Operations', 'Development'];
-const GROUPS_ZH = ['概览', '快速开始', '概念', '运维', '开发'];
+const GROUPS_EN = ['Overview', 'Interactive demo', 'Getting started', 'Concepts', 'Operations', 'Development'];
+const GROUPS_ZH = ['概览', '交互演示', '快速开始', '概念', '运维', '开发'];
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const read = (p) => readFileSync(p, 'utf8');
@@ -46,8 +47,7 @@ function nav(lang, current) {
   const groups = lang === 'zh' ? GROUPS_ZH : GROUPS_EN;
   return groups.map((group) => {
     const items = PAGES.filter((p) => (lang === 'zh' ? p.groupZh === group : p.groupEn === group)).map((p) => {
-      const md = lang === 'zh' ? read(zhFile(p.slug)) : read(enFile(p.slug));
-      const title = titleOf(md, p.slug);
+      const title = p.slug === 'demo' ? (lang === 'zh' ? '交互演示' : 'Interactive demo') : titleOf(lang === 'zh' ? read(zhFile(p.slug)) : read(enFile(p.slug)), p.slug);
       const href = lang === 'zh' ? (p.slug === 'overview' ? '/zh/' : `/zh/docs/${p.slug}/`) : (p.slug === 'overview' ? '/' : `/docs/${p.slug}/`);
       return `<a class="${href === current ? 'on' : ''}" href="${href}">${esc(title)}</a>`;
     }).join('');
@@ -55,23 +55,18 @@ function nav(lang, current) {
   }).join('');
 }
 
-function demoHtml(lang) {
+function appDemoHtml(lang) {
   const zh = lang === 'zh';
-  return `<section class="demo demo-job" data-demo data-lang="${zh ? 'zh' : 'en'}">
-  <div class="demo-head"><div><span class="kicker">${zh ? '仓库任务模拟' : 'REPOSITORY JOB SIMULATION'}</span><h2>${zh ? '看一次 Fledge 任务如何完成' : 'See one Fledge job end to end'}</h2><p>${zh ? '选择一个场景，观察计划、失败测试、修复、检查、Pull Request 与人工审查。不会调用模型，也不会改动任何仓库。' : 'Pick a scenario and follow the plan, the failing test, the fix, the checks, the pull request and human review. No model calls or repositories are touched.'}</p></div><span class="demo-badge">${zh ? '仓库任务' : 'REPOSITORY JOB'}</span></div>
-  <div class="demo-controls"><div class="demo-tabs" role="tablist"><button type="button" class="on" data-scenario="bug">${zh ? '修复缺陷' : 'Bug fix'}</button><button type="button" data-scenario="docs">${zh ? '更新文档' : 'Documentation'}</button><button type="button" data-scenario="ui">${zh ? '界面改动' : 'UI change'}</button></div><div class="demo-actions"><button type="button" class="btn primary" data-demo-start>${zh ? '开始任务' : 'Start job'}</button><button type="button" class="btn" data-demo-reset>${zh ? '重置' : 'Reset'}</button></div></div>
-  <div class="job"><aside class="job-side"><div class="job-kicker">${zh ? '任务' : 'JOB'}</div><div class="job-meta"><span>${zh ? '仓库' : 'Repository'}</span><b data-demo-repo>—</b></div><div class="job-meta"><span>${zh ? '分支' : 'Branch'}</span><b data-demo-branch>—</b></div><div class="job-meta"><span>${zh ? '环境' : 'Environment'}</span><b>${zh ? '隔离容器' : 'Isolated container'}</b></div><div class="job-meta"><span>${zh ? '交付物' : 'Deliverable'}</span><b>${zh ? '1 个 Pull Request' : '1 pull request'}</b></div><div class="job-ledger"><div data-step="plan"><i></i>${zh ? '计划' : 'Plan'}</div><div data-step="test"><i></i>${zh ? '失败测试' : 'Failing test'}</div><div data-step="patch"><i></i>${zh ? '修复' : 'Patch'}</div><div data-step="checks"><i></i>${zh ? '检查' : 'Checks'}</div><div data-step="pr"><i></i>${zh ? 'Pull Request' : 'Pull request'}</div><div data-step="review"><i></i>${zh ? '人工审查' : 'Human review'}</div></div></aside><div class="job-main"><div class="job-log" data-demo-chat aria-live="polite"><div class="demo-empty">${zh ? '选择场景后开始。' : 'Choose a scenario, then start.'}</div></div><div class="job-actions" data-demo-actions></div></div></div>
-  <div class="demo-foot"><span>${zh ? '浏览器内模拟 · 不接触模型或仓库' : 'Runs in your browser · no model or repository access'}</span><a href="${zh ? '/zh/docs/getting-started/' : '/docs/getting-started/'}">${zh ? '真实部署' : 'Deploy for real'} ↗</a></div>
-</section>
-<script>window.FLEDGE_DEMO=${JSON.stringify(zh ? {
-  bug: { repo: 'github.com/acme/app', branch: 'fledge/parser-empty', plan: '复现空输入失败，补充回归测试，修改 src/parser.ts，运行 test、lint 与 build，然后创建一个 Pull Request。', test: 'FAIL  parser.test.ts > rejects empty input', patch: 'src/parser.ts  +8 −3', checks: 'test ✓  lint ✓  build ✓', pr: '#42  fix(parser): reject empty input  · 1 commit  · checks green', review: '证据已附在 PR 上，等待维护者审查。', merged: '维护者已合并。' },
-  docs: { repo: 'github.com/acme/app', branch: 'fledge/metrics-token-docs', plan: '补充生产 METRICS_TOKEN 要求与回滚说明，检查链接与构建，然后创建一个 Pull Request。', test: 'FAIL  docs-check > deploy.md mentions METRICS_TOKEN', patch: 'docs/deploy.md  +18 −2', checks: 'links ✓  lint ✓  build ✓', pr: '#43  docs: document the METRICS_TOKEN requirement  · 1 commit', review: '文档证据已附在 PR 上，等待维护者审查。', merged: '维护者已合并。' },
-  ui: { repo: 'github.com/acme/app', branch: 'fledge/repo-list-390', plan: '复现 390px 布局问题，调整仓库列表，生成 390/768/1440 截图，运行 Playwright，然后创建一个 Pull Request。', test: 'FAIL  e2e/repo-list.spec.ts > 390px layout', patch: 'src/client/repo-list.css  +12 −4  · screenshots attached', checks: 'playwright ✓  lint ✓  build ✓', pr: '#44  fix(ui): stack the repository list at 390px  · 1 commit', review: '截图与测试证据已附在 PR 上，等待维护者审查。', merged: '维护者已合并。' },
-} : {
-  bug: { repo: 'github.com/acme/app', branch: 'fledge/parser-empty', plan: 'Reproduce the empty-input failure, add a regression test, patch src/parser.ts, run test, lint and build, then open one pull request.', test: 'FAIL  parser.test.ts > rejects empty input', patch: 'src/parser.ts  +8 −3', checks: 'test ✓  lint ✓  build ✓', pr: '#42  fix(parser): reject empty input  · 1 commit  · checks green', review: 'Evidence attached. Waiting for the maintainer.', merged: 'Merged by the maintainer.' },
-  docs: { repo: 'github.com/acme/app', branch: 'fledge/metrics-token-docs', plan: 'Document the production METRICS_TOKEN requirement and rollback note, check links and build, then open one pull request.', test: 'FAIL  docs-check > deploy.md mentions METRICS_TOKEN', patch: 'docs/deploy.md  +18 −2', checks: 'links ✓  lint ✓  build ✓', pr: '#43  docs: document the METRICS_TOKEN requirement  · 1 commit', review: 'Documentation evidence attached. Waiting for the maintainer.', merged: 'Merged by the maintainer.' },
-  ui: { repo: 'github.com/acme/app', branch: 'fledge/repo-list-390', plan: 'Reproduce the 390px layout, adjust the repository list, capture 390/768/1440 screenshots, run Playwright, then open one pull request.', test: 'FAIL  e2e/repo-list.spec.ts > 390px layout', patch: 'src/client/repo-list.css  +12 −4  · screenshots attached', checks: 'playwright ✓  lint ✓  build ✓', pr: '#44  fix(ui): stack the repository list at 390px  · 1 commit', review: 'Screenshots and test evidence attached. Waiting for the maintainer.', merged: 'Merged by the maintainer.' },
-})};</script>`;
+  const jobs = zh ? {
+    app: { repo: 'acme/app', branch: 'fledge/parser-empty', kind: '缺陷修复', title: '修复 parser 空输入失败', risk: 'T1', quota: '1 元', cost: '0.08 元', plan: ['复现空输入失败', '添加回归测试', '修改 src/parser.ts', '运行 test、lint 与 build', '创建一个 Pull Request'], fail: 'FAIL  parser.test.ts > rejects empty input\n  Expected: ParseError\n  Received: undefined', pass: 'PASS  parser.test.ts > rejects empty input\n\nTests: 12 passed', checks: ['test', 'lint', 'build'], files: [{ path: 'src/parser.ts', change: '+8 −3' }, { path: 'parser.test.ts', change: '+18' }], pr: { title: 'fix(parser): reject empty input', body: 'Closes #41。添加回归测试，并在 tokenize 前拒绝空输入。', commit: 'a1b2c3d' } },
+    docs: { repo: 'acme/docs', branch: 'fledge/metrics-token', kind: '文档更新', title: '补充 METRICS_TOKEN 生产要求', risk: 'T0', quota: '1 元', cost: '0.03 元', plan: ['核对 deploy.md 与配置代码', '补充生产启动条件与回滚说明', '检查链接与构建', '创建一个 Pull Request'], fail: 'FAIL  docs-check > deploy.md mentions METRICS_TOKEN', pass: 'PASS  docs-check > deploy.md mentions METRICS_TOKEN\n\nLinks: 42 checked, 0 broken', checks: ['links', 'lint', 'build'], files: [{ path: 'docs/deploy.md', change: '+18 −2' }], pr: { title: 'docs: document the METRICS_TOKEN requirement', body: 'Closes #43。说明生产启动条件，并补充密钥缺失时的回滚步骤。', commit: 'b2c3d4e' } },
+    ui: { repo: 'acme/ui', branch: 'fledge/repo-list-390', kind: '界面改动', title: '仓库列表在 390px 下改为单列', risk: 'T1', quota: '1 元', cost: '0.06 元', plan: ['复现 390px 布局问题', '调整仓库列表样式', '生成 390/768/1440 截图', '运行 Playwright', '创建一个 Pull Request'], fail: 'FAIL  e2e/repo-list.spec.ts > 390px layout\n  Expected: single column\n  Received: overflow', pass: 'PASS  e2e/repo-list.spec.ts > 390px layout\n\nScreenshots: 390 / 768 / 1440', checks: ['playwright', 'lint', 'build'], files: [{ path: 'src/client/repo-list.css', change: '+12 −4' }, { path: 'docs/verification/390.png', change: 'new' }], pr: { title: 'fix(ui): stack the repository list at 390px', body: 'Closes #44。窄屏改为单列，并附 390/768/1440 截图。', commit: 'c3d4e5f' } },
+  } : {
+    app: { repo: 'acme/app', branch: 'fledge/parser-empty', kind: 'Bug fix', title: 'Fix parser empty input', risk: 'T1', quota: '1 CNY', cost: '0.08 CNY', plan: ['Reproduce the empty-input failure', 'Add a regression test', 'Patch src/parser.ts', 'Run test, lint and build', 'Open one pull request'], fail: 'FAIL  parser.test.ts > rejects empty input\n  Expected: ParseError\n  Received: undefined', pass: 'PASS  parser.test.ts > rejects empty input\n\nTests: 12 passed', checks: ['test', 'lint', 'build'], files: [{ path: 'src/parser.ts', change: '+8 −3' }, { path: 'parser.test.ts', change: '+18' }], pr: { title: 'fix(parser): reject empty input', body: 'Closes #41. Adds a regression test and rejects empty input before tokenizing.', commit: 'a1b2c3d' } },
+    docs: { repo: 'acme/docs', branch: 'fledge/metrics-token', kind: 'Documentation', title: 'Document the METRICS_TOKEN requirement', risk: 'T0', quota: '1 CNY', cost: '0.03 CNY', plan: ['Compare deploy.md with the configuration code', 'Add the production startup condition and rollback note', 'Check links and build', 'Open one pull request'], fail: 'FAIL  docs-check > deploy.md mentions METRICS_TOKEN', pass: 'PASS  docs-check > deploy.md mentions METRICS_TOKEN\n\nLinks: 42 checked, 0 broken', checks: ['links', 'lint', 'build'], files: [{ path: 'docs/deploy.md', change: '+18 −2' }], pr: { title: 'docs: document the METRICS_TOKEN requirement', body: 'Closes #43. Explains the production startup condition and the rollback step when the secret is missing.', commit: 'b2c3d4e' } },
+    ui: { repo: 'acme/ui', branch: 'fledge/repo-list-390', kind: 'UI change', title: 'Stack the repository list at 390px', risk: 'T1', quota: '1 CNY', cost: '0.06 CNY', plan: ['Reproduce the 390px layout', 'Adjust the repository list styles', 'Capture 390/768/1440 screenshots', 'Run Playwright', 'Open one pull request'], fail: 'FAIL  e2e/repo-list.spec.ts > 390px layout\n  Expected: single column\n  Received: overflow', pass: 'PASS  e2e/repo-list.spec.ts > 390px layout\n\nScreenshots: 390 / 768 / 1440', checks: ['playwright', 'lint', 'build'], files: [{ path: 'src/client/repo-list.css', change: '+12 −4' }, { path: 'docs/verification/390.png', change: 'new' }], pr: { title: 'fix(ui): stack the repository list at 390px', body: 'Closes #44. Single column on narrow screens, with 390/768/1440 screenshots.', commit: 'c3d4e5f' } },
+  };
+  return `<div class="fd" data-fd><aside class="fd-side"><div class="fd-brand">F <span>Fledge</span></div><div class="fd-label">${zh ? '仓库' : 'Repositories'}</div><div class="fd-repos" data-fd-repos></div><div class="fd-label">${zh ? '账本' : 'Ledger'}</div><ul class="fd-ledger" data-fd-ledger></ul></aside><main class="fd-main"><header class="fd-head"><div><span class="fd-kicker">JOB</span><h3 data-fd-title></h3><p data-fd-sub></p></div><div class="fd-head-right"><span class="fd-risk"><b data-fd-kind></b> · <b data-fd-risk></b></span><span class="fd-status" data-fd-status></span></div></header><nav class="fd-tabs" data-fd-tabs></nav><section class="fd-panel" data-fd-panel></section><footer class="fd-actions" data-fd-actions></footer></main></div><script>window.FLEDGE_APP=${JSON.stringify({ lang: zh ? 'zh' : 'en', jobs })};</script>`;
 }
 
 function page({ lang, slug, title, body, home = false }) {
@@ -81,8 +76,8 @@ function page({ lang, slug, title, body, home = false }) {
   const brand = isZh ? '/zh/' : '/';
   return `<!doctype html><html lang="${isZh ? 'zh-CN' : 'en'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)} — Fledge Docs</title><meta name="description" content="${esc(title)} — Fledge documentation"><meta name="theme-color" content="#080a0f">
-<link rel="icon" href="/assets/images/logo.svg"><link rel="stylesheet" href="/assets/docs.css"><link rel="stylesheet" href="/assets/demo.css?v=3">
-<script defer src="/assets/demo.js?v=3"></script></head><body>
+<link rel="icon" href="/assets/images/logo.svg"><link rel="stylesheet" href="/assets/docs.css"><link rel="stylesheet" href="/assets/demo.css?v=3"><link rel="stylesheet" href="/assets/app.css">
+<script defer src="/assets/demo.js?v=3"></script><script defer src="/assets/app.js"></script></head><body>
 <header class="site-header"><a class="brand" href="${brand}"><span class="brand-mark">F</span> HUGOXK <small>LAB / FLEDGE DOCS</small></a>
 <nav class="nav"><a href="${brand}">${isZh ? '文档首页' : 'Docs home'}</a><a href="${other}">${isZh ? 'English' : '中文'}</a><a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a><a href="${GH}">GitHub ↗</a></nav></header>
 <div class="docs-shell"><aside class="docs-nav"><h2>Fledge</h2>${nav(lang, current)}<div class="app"><a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a><a href="${GH}">${isZh ? '源仓库' : 'Source'} ↗</a></div></aside><main class="docs-main">${body}</main></div>
@@ -95,18 +90,27 @@ mkdirSync(join(OUT, 'docs'), { recursive: true });
 mkdirSync(join(OUT, 'zh', 'docs'), { recursive: true });
 
 for (const p of PAGES) {
-  const enMd = rewrite(read(enFile(p.slug)), 'en');
-  const enCut = p.slug === 'overview' ? enMd.indexOf('\n## ') : -1;
-  const enIntro = enCut === -1 ? enMd : enMd.slice(0, enCut);
-  const enRest = enCut === -1 ? '' : enMd.slice(enCut + 1);
-  const enBody = `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/en/${p.slug}.md">Edit content/en/${p.slug}.md on GitHub ↗</a></p>` + marked.parse(enIntro) + (p.slug === 'overview' ? demoHtml('en') : '') + marked.parse(enRest);
-  const zhMd = rewrite(read(zhFile(p.slug)), 'zh');
-  const zhCut = p.slug === 'overview' ? zhMd.indexOf('\n## ') : -1;
-  const zhIntro = zhCut === -1 ? zhMd : zhMd.slice(0, zhCut);
-  const zhRest = zhCut === -1 ? '' : zhMd.slice(zhCut + 1);
-  const zhBody = `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/zh/${p.slug}.md">在 GitHub 上编辑 content/zh/${p.slug}.md ↗</a></p>` + marked.parse(zhIntro) + (p.slug === 'overview' ? demoHtml('zh') : '') + marked.parse(zhRest);
-  const enTitle = titleOf(read(enFile(p.slug)), p.slug);
-  const zhTitle = titleOf(read(zhFile(p.slug)), enTitle);
+  const isDemo = p.slug === 'demo';
+  const enTitle = isDemo ? 'Interactive demo' : titleOf(read(enFile(p.slug)), p.slug);
+  const zhTitle = isDemo ? '交互演示' : titleOf(read(zhFile(p.slug)), enTitle);
+  const enEdit = isDemo ? '' : `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/en/${p.slug}.md">Edit content/en/${p.slug}.md on GitHub ↗</a></p>`;
+  const zhEdit = isDemo ? '' : `<p class="mut" style="margin-bottom:18px"><a href="${DOCS_GH}/blob/main/content/zh/${p.slug}.md">在 GitHub 上编辑 content/zh/${p.slug}.md ↗</a></p>`;
+  let enBody, zhBody;
+  if (isDemo) {
+    enBody = appDemoHtml('en');
+    zhBody = appDemoHtml('zh');
+  } else {
+    const enMd = rewrite(read(enFile(p.slug)), 'en');
+    const enCut = p.slug === 'overview' ? enMd.indexOf('\n## ') : -1;
+    const enIntro = enCut === -1 ? enMd : enMd.slice(0, enCut);
+    const enRest = enCut === -1 ? '' : enMd.slice(enCut + 1);
+    enBody = enEdit + marked.parse(enIntro) + (p.slug === 'overview' ? appDemoHtml('en') : '') + marked.parse(enRest);
+    const zhMd = rewrite(read(zhFile(p.slug)), 'zh');
+    const zhCut = p.slug === 'overview' ? zhMd.indexOf('\n## ') : -1;
+    const zhIntro = zhCut === -1 ? zhMd : zhMd.slice(0, zhCut);
+    const zhRest = zhCut === -1 ? '' : zhMd.slice(zhCut + 1);
+    zhBody = zhEdit + marked.parse(zhIntro) + (p.slug === 'overview' ? appDemoHtml('zh') : '') + marked.parse(zhRest);
+  }
   const enDir = p.slug === 'overview' ? OUT : join(OUT, 'docs', p.slug);
   const zhDir = p.slug === 'overview' ? join(OUT, 'zh') : join(OUT, 'zh', 'docs', p.slug);
   mkdirSync(enDir, { recursive: true }); mkdirSync(zhDir, { recursive: true });
@@ -142,5 +146,7 @@ for (const [from, to] of [
 cpSync(join(ROOT, 'docs', 'assets', 'docs.css'), join(OUT, 'assets', 'docs.css'));
 cpSync(join(ROOT, 'docs', 'assets', 'demo.css'), join(OUT, 'assets', 'demo.css'));
 cpSync(join(ROOT, 'docs', 'assets', 'demo.js'), join(OUT, 'assets', 'demo.js'));
+cpSync(join(ROOT, 'docs', 'assets', 'app.css'), join(OUT, 'assets', 'app.css'));
+cpSync(join(ROOT, 'docs', 'assets', 'app.js'), join(OUT, 'assets', 'app.js'));
 if (existsSync(join(ROOT, 'docs', 'assets', 'images'))) cpSync(join(ROOT, 'docs', 'assets', 'images'), join(OUT, 'assets', 'images'), { recursive: true });
 console.log(`built ${PAGES.length * 2} pages into ${OUT}`);
