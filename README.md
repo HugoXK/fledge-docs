@@ -1,23 +1,19 @@
 # Fledge documentation site
 
-Static documentation for [Fledge](https://github.com/HugoXK/fledge), published at
-<https://fledge-docs.hugoxk.online/> and mirrored at
-<https://hugoxk.online/fledge/docs/>.
+Bilingual static documentation for [Fledge](https://github.com/HugoXK/fledge), published at <https://fledge-docs.hugoxk.online/>.
 
-The site is built from the product repository's `README.md`, `README.zh.md` and
-`docs/` on a schedule; the docs are not copied or pinned here. `docs/` in this
-repo only owns the stylesheet and logo.
+- English: `/`
+- 中文: `/zh/`
 
-## Local build
+The English pages are built from `HugoXK/fledge` (`README.md` and `docs/`). The Chinese pages are maintained in `translations/zh/` so the product repository stays English-only. Both languages share the same navigation structure; untranslated reference pages are listed under **英文参考** with an `EN` mark and are not mixed into the Chinese pages.
+
+The landing page includes a browser-only Fledge simulation (plan → test → PR → human review). It makes no model calls and touches no repositories.
+
+## Build
 
 ```sh
 npm install
-# custom domain: pages under /docs/, shared assets at /assets/
-FLEDGE_DIR=../fledge BASE_PATH=/docs OUT_DIR=site npm run build
-# hugoxk.online mirror: pages and assets both under /fledge/docs/
-FLEDGE_DIR=../fledge BASE_PATH=/fledge/docs OUT_DIR=site-mirror npm run build
+FLEDGE_DIR=../fledge npm run build
 ```
 
-## License
-
-The documentation and this build are part of Fledge, Apache-2.0.
+`FLEDGE_DIR` points at a checkout of `HugoXK/fledge`. The site is written to `site/`.

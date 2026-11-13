@@ -1,0 +1,31 @@
+.demo{margin:30px 0 38px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#0e141c,#0a0f15);padding:22px;position:relative;overflow:hidden}
+.demo:before{content:"";position:absolute;inset:0 0 auto;height:180px;background:radial-gradient(600px 220px at 20% 0,rgba(184,243,74,.10),transparent 70%);pointer-events:none}
+.demo-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;position:relative;z-index:1}
+.demo-head h2{font-size:24px;letter-spacing:-.025em;margin:4px 0 8px}
+.demo-head p{color:var(--muted);font-size:14.5px;line-height:1.7;max-width:720px;margin:0}
+.demo-badge{flex:none;border:1px solid rgba(184,243,74,.3);border-radius:999px;padding:5px 10px;color:var(--accent);font:600 10px var(--mono);letter-spacing:.12em}
+.demo-controls{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;margin:20px 0 12px;position:relative;z-index:1}
+.demo-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.demo-tabs button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.02);color:var(--muted);padding:8px 12px;font:600 12.5px var(--sans);cursor:pointer}
+.demo-tabs button:hover{color:var(--ink);border-color:var(--line-strong)}
+.demo-tabs button.on{color:#0b1206;background:var(--accent);border-color:var(--accent)}
+.demo-actions{display:flex;gap:8px;flex-wrap:wrap}
+.demo .btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.02);color:var(--ink);padding:8px 13px;font:600 12.5px var(--sans);cursor:pointer}
+.demo .btn:hover{border-color:var(--line-strong)}
+.demo .btn.primary{background:var(--accent);border-color:var(--accent);color:#0b1206}
+.demo-chat{height:300px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#070b10;padding:16px;position:relative;z-index:1}
+.demo-empty{color:var(--muted-2);font-size:13px;padding:8px 2px}
+.demo-msg{display:flex;gap:10px;margin:0 0 12px;align-items:flex-start}
+.demo-msg .who{flex:0 0 76px;font:600 9.5px var(--mono);letter-spacing:.1em;color:var(--muted-2);text-transform:uppercase;padding-top:3px}
+.demo-msg p{margin:0;color:#c9d5e2;font-size:13.5px;line-height:1.65;background:#0d141c;border:1px solid var(--line);border-radius:9px;padding:9px 12px;max-width:calc(100% - 90px)}
+.demo-msg.user .who{color:var(--mint)}
+.demo-msg.user p{background:rgba(103,232,199,.06);border-color:rgba(103,232,199,.2)}
+.demo-msg.bot .who{color:var(--accent)}
+.demo-msg.bot p{border-color:rgba(184,243,74,.18)}
+.demo-msg.system p{color:var(--muted);background:transparent;border-style:dashed}
+.demo-approve{margin:2px 0 8px 86px}
+.demo-approve button{border:1px solid var(--accent);border-radius:7px;background:rgba(184,243,74,.1);color:var(--accent);font:600 12px var(--sans);padding:7px 11px;cursor:pointer}
+.demo-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;color:var(--muted-2);font:11px var(--mono);letter-spacing:.04em;position:relative;z-index:1}
+.demo-foot a{color:var(--accent)}
+@media(max-width:640px){.demo{padding:16px}.demo-head h2{font-size:20px}.demo-chat{height:260px}.demo-msg .who{flex-basis:58px}.demo-msg p{max-width:calc(100% - 70px)}}
+.en-mark{display:inline-block;margin-left:5px;padding:1px 4px;border:1px solid var(--line);border-radius:3px;color:var(--muted-2);font:9px var(--mono);letter-spacing:.08em;vertical-align:1px}
