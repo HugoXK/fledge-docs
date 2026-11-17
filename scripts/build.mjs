@@ -74,14 +74,49 @@ function page({ lang, slug, title, body, home = false }) {
   const current = home ? (isZh ? '/zh/' : '/') : (isZh ? `/zh/docs/${slug}/` : `/docs/${slug}/`);
   const other = home ? (isZh ? '/' : '/zh/') : (isZh ? `/docs/${slug}/` : `/zh/docs/${slug}/`);
   const brand = isZh ? '/zh/' : '/';
-  return `<!doctype html><html lang="${isZh ? 'zh-CN' : 'en'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(title)} — Fledge Docs</title><meta name="description" content="${esc(title)} — Fledge documentation"><meta name="theme-color" content="#080a0f">
-<link rel="icon" href="/assets/images/logo.svg"><link rel="stylesheet" href="/assets/docs.css"><link rel="stylesheet" href="/assets/demo.css?v=3"><link rel="stylesheet" href="/assets/app.css">
-<script defer src="/assets/demo.js?v=3"></script><script defer src="/assets/app.js"></script></head><body>
-<header class="site-header"><a class="brand" href="${brand}"><span class="brand-mark">F</span> HUGOXK <small>LAB / FLEDGE DOCS</small></a>
-<nav class="nav"><a href="${brand}">${isZh ? '文档首页' : 'Docs home'}</a><a href="${other}">${isZh ? 'English' : '中文'}</a><a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a><a href="${GH}">GitHub ↗</a></nav></header>
-<div class="docs-shell"><aside class="docs-nav"><h2>Fledge</h2>${nav(lang, current)}<div class="app"><a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a><a href="${GH}">${isZh ? '源仓库' : 'Source'} ↗</a></div></aside><main class="docs-main">${body}</main></div>
-<footer class="docs-footer"><span>© 2026 HUGOXK // LAB · FLEDGE</span><div><a href="${brand}">${isZh ? '首页' : 'Home'}</a><a href="${APP}">${isZh ? '应用' : 'App'}</a><a href="${GH}">GitHub</a></div></footer></body></html>`;
+  return `<!doctype html>
+<html lang="${isZh ? 'zh-CN' : 'en'}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)} — Fledge Docs</title>
+<meta name="description" content="${esc(title)} — Fledge documentation">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0d0c0b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/images/logo.svg">
+<script>try{var t=localStorage.getItem('fledge-docs-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/docs.css">
+<link rel="stylesheet" href="/assets/demo.css?v=3">
+<link rel="stylesheet" href="/assets/app.css">
+<script defer src="/assets/demo.js?v=3"></script>
+<script defer src="/assets/app.js"></script>
+<script defer src="/assets/docs.js"></script>
+</head>
+<body class="${home ? 'docs-home' : ''}">
+<a class="skip-link" href="#main">${isZh ? '跳到主要内容' : 'Skip to main content'}</a>
+<header class="site-header">
+  <a class="brand" href="${brand}"><span class="brand-mark">F</span><span>Fledge <small>Docs</small></span></a>
+  <div class="header-actions">
+    <nav class="nav" aria-label="${isZh ? '文档导航' : 'Docs navigation'}">
+      <a href="${brand}">${isZh ? '文档首页' : 'Docs home'}</a>
+      <a href="${other}">${isZh ? 'English' : '中文'}</a>
+      <a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a>
+      <a href="${GH}">GitHub ↗</a>
+    </nav>
+    <button class="theme-toggle" type="button" data-docs-theme aria-label="${isZh ? '切换主题' : 'Switch theme'}" title="${isZh ? '切换主题' : 'Switch theme'}">
+      <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 15.2A8.4 8.4 0 0 1 8.8 4a8.4 8.4 0 1 0 11.2 11.2Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+<div class="docs-shell">
+  <aside class="docs-nav" aria-label="Fledge documentation"><h2>Fledge</h2>${nav(lang, current)}<div class="app"><a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a><a href="${GH}">${isZh ? '源仓库' : 'Source'} ↗</a></div></aside>
+  <main class="docs-main" id="main">${body}</main>
+</div>
+<footer class="docs-footer"><span>© 2026 Fledge · docs</span><div><a href="${brand}">${isZh ? '首页' : 'Home'}</a><a href="${APP}">${isZh ? '应用' : 'App'}</a><a href="${GH}">GitHub</a></div></footer>
+</body>
+</html>`;
 }
 
 rmSync(OUT, { recursive: true, force: true });
