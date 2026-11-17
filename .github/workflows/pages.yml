@@ -3,13 +3,7 @@ name: Build Fledge docs
 on:
   push:
     branches: [main]
-    paths:
-      - 'scripts/**'
-      - 'docs/assets/**'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
-  schedule:
-    - cron: '43 */6 * * *'
 
 permissions:
   contents: read
@@ -18,31 +12,22 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: HugoXK/fledge
-          ref: main
-          path: fledge
-          sparse-checkout: |
-            docs
-            README.md
-            README.zh.md
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - run: npm install --no-audit --no-fund
-      - run: node scripts/build.mjs
-        env:
-          BASE_PATH: /fledge-docs/docs
-          ASSET_BASE: /fledge-docs/assets
+          node-version: "22"
+      - run: npm ci
+      - run: OUT_DIR=site node scripts/build.mjs
+      - run: echo docs.fledge.hugoxk.online > site/CNAME
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
