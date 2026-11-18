@@ -292,3 +292,62 @@ body.docs-home .docs-main .mut { margin-bottom: 14px; }
   --warn: #e0b36a;
   --danger: #e88a7d;
 }
+
+/* Ask DeepWiki — shared control on the Fledge docs home. */
+.nav a.nav-ask {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px;
+  color: var(--ink);
+}
+.nav a.nav-ask:before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--warn); box-shadow: 0 0 0 3px color-mix(in srgb, var(--warn) 20%, transparent);
+}
+.nav a.nav-ask:hover { border-color: var(--accent); background: var(--panel-2); }
+/* Ask DeepWiki — the shared agent door on the home page. */
+.ask-dw {
+  position: relative; margin: 44px 0 8px; padding: 28px 30px;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: linear-gradient(180deg, var(--panel), var(--bg-soft));
+  overflow: hidden;
+}
+.ask-dw:before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--warn), transparent);
+  opacity: .65;
+}
+.ask-dw-label {
+  font: 600 10px var(--mono); letter-spacing: .14em;
+  text-transform: uppercase; color: var(--muted-2);
+}
+.ask-dw-label span { color: var(--accent); }
+.ask-dw h2 {
+  margin: 10px 0 10px; padding: 0; border: 0;
+  font-size: clamp(24px, 3vw, 32px); line-height: 1.08; letter-spacing: -.035em;
+}
+.ask-dw h2 em { font-style: normal; color: var(--accent); }
+.ask-dw p { max-width: 68ch; margin: 0 0 18px; color: var(--muted); }
+.ask-dw-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.ask-dw-actions code {
+  padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface-sunken); color: var(--muted); font: 11.5px var(--mono);
+  max-width: 100%; overflow-x: auto;
+}
+.ask-dw-actions small { width: 100%; color: var(--muted-2); font-size: 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 38px; padding: 0 16px;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--panel-2); color: var(--ink);
+  font: 650 13px var(--sans); cursor: pointer;
+}
+.btn:hover { border-color: var(--line-strong); text-decoration: none; }
+.btn.primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: var(--accent-ink);
+}
+.btn.primary:hover { filter: brightness(1.06); }
+
+
+@media (max-width: 560px) { .ask-dw { padding: 22px 20px; } }
