@@ -20,10 +20,20 @@ const PAGES = [
   { slug: 'quota', groupEn: 'Operations', groupZh: '运维' },
   { slug: 'operations', groupEn: 'Operations', groupZh: '运维' },
   { slug: 'contributing', groupEn: 'Development', groupZh: '开发' },
+  { slug: 'deep-dive', groupEn: 'Internals', groupZh: '内部实现' },
   { slug: 'deepwiki', groupEn: 'Reference', groupZh: '参考' },
 ];
-const GROUPS_EN = ['Overview', 'Interactive demo', 'Getting started', 'Concepts', 'Operations', 'Development', 'Reference'];
-const GROUPS_ZH = ['概览', '交互演示', '快速开始', '概念', '运维', '开发', '参考'];
+const GROUPS_EN = ['Overview', 'Interactive demo', 'Getting started', 'Concepts', 'Operations', 'Development', 'Internals', 'Reference'];
+const GROUPS_ZH = ['概览', '交互演示', '快速开始', '概念', '运维', '开发', '内部实现', '参考'];
+const HOME_START = [
+  ['getting-started', 'Connect a repository and run one job.', '连接仓库并跑一个 job。'],
+  ['architecture', 'The control plane, isolation and the bridge.', '控制平面、隔离与 bridge。'],
+  ['security', 'Credentials, containers and the review gate.', '凭据、容器与 review gate。'],
+  ['quota', 'Metering, cost and the quota ledger.', '计量、成本与配额账本。'],
+  ['operations', 'Deploy, backup and observability.', '部署、备份与可观测性。'],
+  ['deep-dive', 'The DeepWiki map in one page.', '一页看懂 DeepWiki 地图。'],
+  ['deepwiki', 'Ask the codebase.', '向代码库提问。'],
+];
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const read = (p) => readFileSync(p, 'utf8');
@@ -42,6 +52,11 @@ function rewrite(md, lang) {
     return `${attr}="${lang === 'zh' ? `/zh/docs/${slug}/` : `/docs/${slug}/`}${hash}"`;
   });
   return s;
+}
+
+function urls(lang, slug) {
+  if (lang === 'zh') return slug === 'overview' ? '/zh/' : `/zh/docs/${slug}/`;
+  return slug === 'overview' ? '/' : `/docs/${slug}/`;
 }
 
 function nav(lang, current) {
@@ -83,6 +98,50 @@ function deepwikiSection(lang) {
 <small>${zh ? '接入说明' : 'Setup guide'}: <a href="${guide}">${zh ? 'DeepWiki 指南' : 'the DeepWiki guide'} ↗</a></small>
 </div>
 </section>`;
+}
+
+function homeHero(lang, lead) {
+  const zh = lang === 'zh';
+  return `<section class="home-hero">
+  <div class="home-hero-copy">
+    <div class="home-eyebrow"><span class="home-dot"></span>${zh ? '托管仓库自迭代' : 'HOSTED REPOSITORY ITERATION'}</div>
+    <h1>${zh ? '一个目标。<br><em>一个可审查的 PR。</em>' : 'One goal.<br><em>One reviewable PR.</em>'}</h1>
+    <p>${marked.parseInline(lead)}</p>
+    <div class="home-ctas"><a class="btn primary" href="${urls(lang, 'getting-started')}">${zh ? '从一个仓库开始' : 'Start with a repository'} <span>↗</span></a><a class="btn ghost" href="${urls(lang, 'architecture')}">${zh ? '看架构' : 'Explore the architecture'} <span>↓</span></a></div>
+    <div class="home-command"><span>→</span><code>https://fledge.hugoxk.online/</code><a href="${APP}" target="_blank" rel="noopener">${zh ? '打开' : 'Open'} ↗</a></div>
+  </div>
+  <div class="home-orbit" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="orbit-center">F</div><div class="orbit-note note-one">${zh ? '连接' : 'connect'} <b>01</b></div><div class="orbit-note note-two">${zh ? '一个目标' : 'one goal'} <b>02</b></div><div class="orbit-note note-three">${zh ? '审查 PR' : 'review the PR'} <b>03</b></div></div>
+</section>`;
+}
+
+function homeProof(lang) {
+  const zh = lang === 'zh';
+  const items = zh
+    ? [['01', '每个仓库同时一个活动 job'], ['02', '每个 job 一个 PR'], ['03', 'T0–T3 门禁，人来合并']]
+    : [['01', 'One active job per repository'], ['02', 'One PR per job'], ['03', 'T0–T3 gates, a person merges']];
+  return `<section class="home-proof"><span>${zh ? 'FLEDGE 一览' : 'FLEDGE AT A GLANCE'}</span>${items.map(([n, text]) => `<div><b>${n}</b>${esc(text)}</div>`).join('')}</section>`;
+}
+
+function homeHow(lang) {
+  const zh = lang === 'zh';
+  const steps = zh
+    ? [['01', '连接', '登录并连接一个仓库。'], ['02', '描述', '一个目标：缺陷、功能或文档改动。'], ['03', '计划', '失败测试、最小修复和要跑的检查。'], ['04', '隔离', '每仓库的容器、卷和 bridge token。'], ['05', '证据', '测试结果、diff 和 tip 上的 CI。'], ['06', '审查', '人来审查并合并 PR。']]
+    : [['01', 'Connect', 'Sign in and connect one repository.'], ['02', 'Describe', 'One goal: a defect, a feature or a doc change.'], ['03', 'Plan', 'The failing test, the smallest fix and the checks.'], ['04', 'Isolate', 'A per-repository container, volume and bridge token.'], ['05', 'Evidence', 'Test results, the diff and CI at the tip.'], ['06', 'Review', 'A person reviews and merges the PR.']];
+  return `<section class="home-section"><div class="section-label">${zh ? '它怎么工作' : 'HOW IT WORKS'} <span>01 / 03</span></div><h2>${zh ? '从连接仓库<br><em>到一个 PR。</em>' : 'From a repository<br><em>to one pull request.</em>'}</h2><p>${zh ? 'Fledge 把一个目标排队，在该仓库自己的容器里运行，并带着证据返回一个聚焦的 Pull Request。' : 'Fledge queues one goal, runs it in the repository\'s own container, and returns the evidence with one focused pull request.'}</p><div class="home-process">${steps.map(([n, title, text]) => `<div><span>${n}</span><strong>${esc(title)}</strong><small>${esc(text)}</small></div>`).join('')}</div></section>`;
+}
+
+function homeStart(lang) {
+  const zh = lang === 'zh';
+  const cards = HOME_START.map(([slug, en, zhText]) => {
+    const title = titleOf(read(lang === 'zh' ? zhFile(slug) : enFile(slug)), slug);
+    return `<a class="home-card" href="${urls(lang, slug)}"><b>${esc(title)}</b><span>${esc(zh ? zhText : en)}</span><em>${zh ? '阅读' : 'Read'} ↗</em></a>`;
+  }).join('');
+  return `<section class="home-section"><div class="section-label">${zh ? '从这里开始' : 'START HERE'} <span>02 / 03</span></div><h2>${zh ? '选一条<br><em>进入系统的路径。</em>' : 'Pick a path<br><em>into the system.</em>'}</h2><div class="home-cards">${cards}</div></section>`;
+}
+
+function homeCta(lang) {
+  const zh = lang === 'zh';
+  return `<section class="home-cta"><div><span class="section-label">${zh ? '准备好了就开始' : 'READY WHEN YOU ARE'}</span><h2>${zh ? '从一个仓库开始。' : 'Start with a repository.'}</h2><p>${zh ? '登录、申请、连接一个仓库，然后描述一个目标。' : 'Sign in, apply, connect one repository, then describe one goal.'}</p></div><a class="btn primary" href="${urls(lang, 'getting-started')}">${zh ? '打开快速开始' : 'Open the quickstart'} <span>↗</span></a></section>`;
 }
 
 function page({ lang, slug, title, body, home = false }) {
@@ -160,12 +219,19 @@ for (const p of PAGES) {
     const enCut = p.slug === 'overview' ? enMd.indexOf('\n## ') : -1;
     const enIntro = enCut === -1 ? enMd : enMd.slice(0, enCut);
     const enRest = enCut === -1 ? '' : enMd.slice(enCut + 1);
-    enBody = enEdit + marked.parse(enIntro) + (p.slug === 'overview' ? appDemoHtml('en') + deepwikiSection('en') : '') + marked.parse(enRest);
     const zhMd = rewrite(read(zhFile(p.slug)), 'zh');
     const zhCut = p.slug === 'overview' ? zhMd.indexOf('\n## ') : -1;
     const zhIntro = zhCut === -1 ? zhMd : zhMd.slice(0, zhCut);
     const zhRest = zhCut === -1 ? '' : zhMd.slice(zhCut + 1);
-    zhBody = zhEdit + marked.parse(zhIntro) + (p.slug === 'overview' ? appDemoHtml('zh') + deepwikiSection('zh') : '') + marked.parse(zhRest);
+    if (p.slug === 'overview') {
+      const enLead = enIntro.replace(/^#\s+[^\n]*\n+/, '').trim();
+      const zhLead = zhIntro.replace(/^#\s+[^\n]*\n+/, '').trim();
+      enBody = `<div class="home">${homeHero('en', enLead)}${homeProof('en')}${homeHow('en')}<section class="home-demo">${appDemoHtml('en')}</section>${homeStart('en')}<section class="home-markdown">${enEdit}${marked.parse(enRest)}</section>${deepwikiSection('en')}${homeCta('en')}</div>`;
+      zhBody = `<div class="home">${homeHero('zh', zhLead)}${homeProof('zh')}${homeHow('zh')}<section class="home-demo">${appDemoHtml('zh')}</section>${homeStart('zh')}<section class="home-markdown">${zhEdit}${marked.parse(zhRest)}</section>${deepwikiSection('zh')}${homeCta('zh')}</div>`;
+    } else {
+      enBody = enEdit + marked.parse(enIntro);
+      zhBody = zhEdit + marked.parse(zhIntro);
+    }
   }
   const enDir = p.slug === 'overview' ? OUT : join(OUT, 'docs', p.slug);
   const zhDir = p.slug === 'overview' ? join(OUT, 'zh') : join(OUT, 'zh', 'docs', p.slug);
