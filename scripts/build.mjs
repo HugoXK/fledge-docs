@@ -20,9 +20,10 @@ const PAGES = [
   { slug: 'quota', groupEn: 'Operations', groupZh: '运维' },
   { slug: 'operations', groupEn: 'Operations', groupZh: '运维' },
   { slug: 'contributing', groupEn: 'Development', groupZh: '开发' },
+  { slug: 'deepwiki', groupEn: 'Reference', groupZh: '参考' },
 ];
-const GROUPS_EN = ['Overview', 'Interactive demo', 'Getting started', 'Concepts', 'Operations', 'Development'];
-const GROUPS_ZH = ['概览', '交互演示', '快速开始', '概念', '运维', '开发'];
+const GROUPS_EN = ['Overview', 'Interactive demo', 'Getting started', 'Concepts', 'Operations', 'Development', 'Reference'];
+const GROUPS_ZH = ['概览', '交互演示', '快速开始', '概念', '运维', '开发', '参考'];
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const read = (p) => readFileSync(p, 'utf8');
@@ -69,11 +70,27 @@ function appDemoHtml(lang) {
   return `<div class="fd" data-fd><aside class="fd-side"><div class="fd-brand">F <span>Fledge</span></div><div class="fd-label">${zh ? '仓库' : 'Repositories'}</div><div class="fd-repos" data-fd-repos></div><div class="fd-label">${zh ? '账本' : 'Ledger'}</div><ul class="fd-ledger" data-fd-ledger></ul></aside><main class="fd-main"><header class="fd-head"><div><span class="fd-kicker">JOB</span><h3 data-fd-title></h3><p data-fd-sub></p></div><div class="fd-head-right"><span class="fd-risk"><b data-fd-kind></b> · <b data-fd-risk></b></span><span class="fd-status" data-fd-status></span></div></header><nav class="fd-tabs" data-fd-tabs></nav><section class="fd-panel" data-fd-panel></section><footer class="fd-actions" data-fd-actions></footer></main></div><script>window.FLEDGE_APP=${JSON.stringify({ lang: zh ? 'zh' : 'en', jobs })};</script>`;
 }
 
+function deepwikiSection(lang) {
+  const zh = lang === 'zh';
+  const guide = zh ? '/zh/docs/deepwiki/' : '/docs/deepwiki/';
+  return `<section class="ask-dw" id="ask">
+<span class="ask-dw-label">${zh ? '向代码库提问' : 'ASK THE CODEBASE'} <span>· DEEPWIKI</span></span>
+<h2>${zh ? '有问题？<em>问 DeepWiki。</em>' : 'Questions?<br><em>Ask DeepWiki.</em>'}</h2>
+<p>${zh ? 'DeepWiki 索引 Fledge 仓库，回答时给出源码链接。用右下角的 <strong>问 DeepWiki</strong> 按钮在这里对话，或打开页面浏览。同一个 MCP 服务器也能接进 Claude Code、Codex、OpenCode 或 DeepSeek Harness。' : 'DeepWiki indexes the Fledge repository and answers with links to the source. Use the <strong>Ask DeepWiki</strong> button in the bottom-right corner to chat here, or open the page to browse. The same MCP server works inside Claude Code, Codex, OpenCode or DeepSeek Harness.'}</p>
+<div class="ask-dw-actions">
+<a class="btn primary" href="https://deepwiki.com/HugoXK/fledge" target="_blank" rel="noopener" data-deepwiki-open>${zh ? '问 DeepWiki' : 'Ask DeepWiki'} <span>↗</span></a>
+<code>claude mcp add -s user -t http deepwiki https://mcp.deepwiki.com/mcp</code>
+<small>${zh ? '接入说明' : 'Setup guide'}: <a href="${guide}">${zh ? 'DeepWiki 指南' : 'the DeepWiki guide'} ↗</a></small>
+</div>
+</section>`;
+}
+
 function page({ lang, slug, title, body, home = false }) {
   const isZh = lang === 'zh';
   const current = home ? (isZh ? '/zh/' : '/') : (isZh ? `/zh/docs/${slug}/` : `/docs/${slug}/`);
   const other = home ? (isZh ? '/' : '/zh/') : (isZh ? `/docs/${slug}/` : `/zh/docs/${slug}/`);
   const brand = isZh ? '/zh/' : '/';
+  const guide = isZh ? '/zh/docs/deepwiki/' : '/docs/deepwiki/';
   return `<!doctype html>
 <html lang="${isZh ? 'zh-CN' : 'en'}">
 <head>
@@ -86,12 +103,15 @@ function page({ lang, slug, title, body, home = false }) {
 <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
 <link rel="icon" href="/assets/images/logo.svg">
 <script>try{var t=localStorage.getItem('fledge-docs-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>window.FLEDGE_DOCS={lang:"${isZh ? 'zh' : 'en'}",guide:"${guide}"};</script>
 <link rel="stylesheet" href="/assets/docs.css">
 <link rel="stylesheet" href="/assets/demo.css?v=3">
 <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/deepwiki.css">
 <script defer src="/assets/demo.js?v=3"></script>
 <script defer src="/assets/app.js"></script>
 <script defer src="/assets/docs.js"></script>
+<script defer src="/assets/deepwiki.js"></script>
 </head>
 <body class="${home ? 'docs-home' : ''}">
 <a class="skip-link" href="#main">${isZh ? '跳到主要内容' : 'Skip to main content'}</a>
@@ -102,6 +122,7 @@ function page({ lang, slug, title, body, home = false }) {
       <a href="${brand}">${isZh ? '文档首页' : 'Docs home'}</a>
       <a href="${other}">${isZh ? 'English' : '中文'}</a>
       <a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a>
+      <a class="nav-ask" href="https://deepwiki.com/HugoXK/fledge" target="_blank" rel="noopener">DeepWiki ↗</a>
       <a href="${GH}">GitHub ↗</a>
     </nav>
     <button class="theme-toggle" type="button" data-docs-theme aria-label="${isZh ? '切换主题' : 'Switch theme'}" title="${isZh ? '切换主题' : 'Switch theme'}">
@@ -111,10 +132,10 @@ function page({ lang, slug, title, body, home = false }) {
   </div>
 </header>
 <div class="docs-shell">
-  <aside class="docs-nav" aria-label="Fledge documentation"><h2>Fledge</h2>${nav(lang, current)}<div class="app"><a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a><a href="${GH}">${isZh ? '源仓库' : 'Source'} ↗</a></div></aside>
+  <aside class="docs-nav" aria-label="Fledge documentation"><h2>Fledge</h2>${nav(lang, current)}<div class="app"><a href="${APP}">${isZh ? '打开 Fledge' : 'Open Fledge'} ↗</a><a href="${GH}">${isZh ? '源仓库' : 'Source'} ↗</a><a href="https://deepwiki.com/HugoXK/fledge" target="_blank" rel="noopener">DeepWiki ↗</a></div></aside>
   <main class="docs-main" id="main">${body}</main>
 </div>
-<footer class="docs-footer"><span>© 2026 Fledge · docs</span><div><a href="${brand}">${isZh ? '首页' : 'Home'}</a><a href="${APP}">${isZh ? '应用' : 'App'}</a><a href="${GH}">GitHub</a></div></footer>
+<footer class="docs-footer"><span>© 2026 Fledge · docs</span><div><a href="${brand}">${isZh ? '首页' : 'Home'}</a><a href="${APP}">${isZh ? '应用' : 'App'}</a><a href="${GH}">GitHub</a><a href="https://deepwiki.com/HugoXK/fledge" target="_blank" rel="noopener">DeepWiki</a></div></footer>
 </body>
 </html>`;
 }
@@ -139,12 +160,12 @@ for (const p of PAGES) {
     const enCut = p.slug === 'overview' ? enMd.indexOf('\n## ') : -1;
     const enIntro = enCut === -1 ? enMd : enMd.slice(0, enCut);
     const enRest = enCut === -1 ? '' : enMd.slice(enCut + 1);
-    enBody = enEdit + marked.parse(enIntro) + (p.slug === 'overview' ? appDemoHtml('en') : '') + marked.parse(enRest);
+    enBody = enEdit + marked.parse(enIntro) + (p.slug === 'overview' ? appDemoHtml('en') + deepwikiSection('en') : '') + marked.parse(enRest);
     const zhMd = rewrite(read(zhFile(p.slug)), 'zh');
     const zhCut = p.slug === 'overview' ? zhMd.indexOf('\n## ') : -1;
     const zhIntro = zhCut === -1 ? zhMd : zhMd.slice(0, zhCut);
     const zhRest = zhCut === -1 ? '' : zhMd.slice(zhCut + 1);
-    zhBody = zhEdit + marked.parse(zhIntro) + (p.slug === 'overview' ? appDemoHtml('zh') : '') + marked.parse(zhRest);
+    zhBody = zhEdit + marked.parse(zhIntro) + (p.slug === 'overview' ? appDemoHtml('zh') + deepwikiSection('zh') : '') + marked.parse(zhRest);
   }
   const enDir = p.slug === 'overview' ? OUT : join(OUT, 'docs', p.slug);
   const zhDir = p.slug === 'overview' ? join(OUT, 'zh') : join(OUT, 'zh', 'docs', p.slug);
@@ -179,6 +200,9 @@ for (const [from, to] of [
 ]) redirect(from, to);
 
 cpSync(join(ROOT, 'docs', 'assets', 'docs.css'), join(OUT, 'assets', 'docs.css'));
+cpSync(join(ROOT, 'docs', 'assets', 'docs.js'), join(OUT, 'assets', 'docs.js'));
+cpSync(join(ROOT, 'docs', 'assets', 'deepwiki.css'), join(OUT, 'assets', 'deepwiki.css'));
+cpSync(join(ROOT, 'docs', 'assets', 'deepwiki.js'), join(OUT, 'assets', 'deepwiki.js'));
 cpSync(join(ROOT, 'docs', 'assets', 'demo.css'), join(OUT, 'assets', 'demo.css'));
 cpSync(join(ROOT, 'docs', 'assets', 'demo.js'), join(OUT, 'assets', 'demo.js'));
 cpSync(join(ROOT, 'docs', 'assets', 'app.css'), join(OUT, 'assets', 'app.css'));
